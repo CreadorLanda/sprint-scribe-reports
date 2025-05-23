@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import { GroupData, Task, Participant } from '@/pages/Index';
 
@@ -15,6 +14,9 @@ export const generatePDF = async (data: ReportData) => {
   // Create a new PDF document
   const doc = new jsPDF();
   
+  // Add a custom font
+  doc.setFont('helvetica', 'normal');
+  
   // Set up document properties
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
@@ -26,103 +28,138 @@ export const generatePDF = async (data: ReportData) => {
     doc.text(text, pageWidth / 2, y, { align: 'center' });
   };
   
-  // Helper function to add section headers
+  // Helper function to add section headers with a gradient background
   const addSectionHeader = (text: string, y: number) => {
-    doc.setFillColor(59, 130, 246); // Blue color
-    doc.rect(margin, y - 6, pageWidth - (margin * 2), 10, 'F');
+    // Draw gradient-like header
+    doc.setFillColor(65, 105, 225); // Royal Blue
+    doc.rect(margin, y - 6, textWidth, 10, 'F');
     doc.setTextColor(255, 255, 255); // White text
     doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
     doc.text(text, margin + 5, y);
     doc.setTextColor(0, 0, 0); // Reset to black
+    doc.setFont('helvetica', 'normal');
     return y + 15; // Return the new y position
   };
   
-  // Add header
-  doc.setFont('helvetica', 'bold');
-  addCenteredText('Relatório de Progresso TLP', 20, 18);
-  addCenteredText(groupData.projectName || 'Sistema de Gestão Escolar', 28, 14);
-  doc.line(margin, 35, pageWidth - margin, 35);
+  // Add decorative header with a blue gradient background
+  doc.setFillColor(51, 102, 204); // Dark blue
+  doc.rect(0, 0, pageWidth, 40, 'F');
   
-  // Add project info
-  let yPos = 45;
+  // Add header text
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  addCenteredText('RELATÓRIO DE PROGRESSO TLP', 20, 18);
+  addCenteredText(groupData.projectName || 'Sistema de Gestão Escolar', 30, 14);
+  doc.setTextColor(0, 0, 0);
+  
+  // Add decorative line
+  doc.setDrawColor(51, 102, 204);
+  doc.setLineWidth(0.5);
+  doc.line(margin, 50, pageWidth - margin, 50);
+  
+  // Add project info box with light blue background
+  let yPos = 60;
+  doc.setFillColor(240, 248, 255); // Alice Blue
+  doc.roundedRect(margin, yPos - 10, textWidth, 45, 3, 3, 'F');
+  
+  // Add project info text
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
-  doc.text(`Grupo: ${groupData.groupNumber || 'Não definido'}`, margin, yPos);
-  yPos += 8;
-  doc.text(`Sprint/Fase: ${groupData.sprint || 'Não definida'}`, margin, yPos);
-  yPos += 8;
-  doc.text(`Data: ${groupData.date ? new Date(groupData.date).toLocaleDateString('pt-BR') : 'Não definida'}`, margin, yPos);
-  yPos += 8;
-  doc.text(`Equipe: ${participants.length} participante(s)`, margin, yPos);
-  yPos += 15;
+  doc.text(`Grupo: ${groupData.groupNumber || 'Não definido'}`, margin + 10, yPos);
+  yPos += 10;
+  doc.text(`Sprint/Fase: ${groupData.sprint || 'Não definida'}`, margin + 10, yPos);
+  yPos += 10;
+  doc.text(`Data: ${groupData.date ? new Date(groupData.date).toLocaleDateString('pt-BR') : 'Não definida'}`, margin + 10, yPos);
+  yPos += 10;
+  doc.text(`Equipe: ${participants.length} participante(s)`, margin + 10, yPos);
+  yPos += 20;
   
-  // Add statistics
-  doc.setFillColor(241, 245, 249); // Light gray
-  doc.roundedRect(margin, yPos, textWidth, 25, 3, 3, 'F');
-  yPos += 8;
+  // Add statistics with improved visuals
+  doc.setFillColor(220, 230, 250); // Light blue
+  doc.roundedRect(margin, yPos, textWidth, 30, 5, 5, 'F');
+  yPos += 10;
   
   const statWidth = textWidth / 3;
-  doc.setFontSize(14);
+  doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
+  doc.setTextColor(51, 102, 204); // Blue text for stats
   doc.text(`${completedTasks.length}`, margin + (statWidth / 2), yPos, { align: 'center' });
   doc.text(`${plannedTasks.length}`, margin + (statWidth * 1.5), yPos, { align: 'center' });
   doc.text(`${participants.length}`, margin + (statWidth * 2.5), yPos, { align: 'center' });
   
-  doc.setFontSize(9);
-  yPos += 8;
+  doc.setFontSize(10);
+  yPos += 10;
+  doc.setTextColor(0, 0, 0); // Reset to black
   doc.setFont('helvetica', 'normal');
   doc.text('Tarefas Concluídas', margin + (statWidth / 2), yPos, { align: 'center' });
   doc.text('Tarefas Planejadas', margin + (statWidth * 1.5), yPos, { align: 'center' });
   doc.text('Membros da Equipe', margin + (statWidth * 2.5), yPos, { align: 'center' });
-  yPos += 15;
+  yPos += 20;
   
-  // Add completed tasks
+  // Add completed tasks with improved visualization
   yPos = addSectionHeader('📋 Tarefas Concluídas', yPos);
   
   if (completedTasks.length > 0) {
     doc.setFont('helvetica', 'normal');
-    completedTasks.forEach(task => {
+    completedTasks.forEach((task, index) => {
       // Check if we need a new page
       if (yPos > 250) {
         doc.addPage();
         yPos = 20;
       }
       
+      // Draw a small bullet point
+      doc.setFillColor(51, 102, 204);
+      doc.circle(margin + 2.5, yPos - 2, 1.5, 'F');
       doc.setFontSize(10);
-      doc.text(`• ${task.description}`, margin + 5, yPos);
-      yPos += 8;
+      
+      // Use slightly different background for alternating items
+      const bgColor = index % 2 === 0 ? [245, 250, 255] : [250, 253, 255];
+      doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+      doc.roundedRect(margin + 6, yPos - 6, textWidth - 6, 10, 1, 1, 'F');
+      
+      doc.text(`${task.description}`, margin + 10, yPos);
+      yPos += 12;
     });
   } else {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'italic');
     doc.text('Nenhuma tarefa concluída nesta sprint.', margin + 5, yPos);
-    yPos += 10;
+    yPos += 12;
   }
-  yPos += 5;
   
-  // Add planned tasks
+  // Add planned tasks with improved visualization
   yPos = addSectionHeader('🎯 Próximas Tarefas', yPos);
   
   if (plannedTasks.length > 0) {
     doc.setFont('helvetica', 'normal');
-    plannedTasks.forEach(task => {
+    plannedTasks.forEach((task, index) => {
       // Check if we need a new page
       if (yPos > 250) {
         doc.addPage();
         yPos = 20;
       }
       
+      // Draw a small checkmark icon
+      doc.setFillColor(51, 102, 204);
+      doc.circle(margin + 2.5, yPos - 2, 1.5, 'F');
       doc.setFontSize(10);
-      doc.text(`• ${task.description}`, margin + 5, yPos);
-      yPos += 8;
+      
+      // Use slightly different background for alternating items
+      const bgColor = index % 2 === 0 ? [245, 250, 255] : [250, 253, 255];
+      doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+      doc.roundedRect(margin + 6, yPos - 6, textWidth - 6, 10, 1, 1, 'F');
+      
+      doc.text(`${task.description}`, margin + 10, yPos);
+      yPos += 12;
     });
   } else {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'italic');
     doc.text('Nenhuma tarefa planejada para a próxima sprint.', margin + 5, yPos);
-    yPos += 10;
+    yPos += 12;
   }
-  yPos += 5;
   
   // Check if we need a new page for participants
   if (yPos > 220) {
@@ -130,55 +167,67 @@ export const generatePDF = async (data: ReportData) => {
     yPos = 20;
   }
   
-  // Add participants
+  // Calculate the average participation
+  const totalParticipation = participants.reduce((sum, p) => sum + p.participation, 0);
+  const averageParticipation = participants.length > 0 ? totalParticipation / participants.length : 0;
+  
+  // Add participants with improved visualization
   yPos = addSectionHeader('👥 Participação da Equipe', yPos);
   
+  // Add explanation of participation calculation
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'italic');
+  doc.text(`Média de participação por membro: ${averageParticipation.toFixed(0)}%`, margin + 5, yPos);
+  yPos += 15;
+  
   if (participants.length > 0) {
-    let xPos = margin;
-    const participantWidth = textWidth / 2;
-    let initialYPos = yPos;
-    let count = 0;
+    // Create a table-like layout for participants
+    doc.setFillColor(240, 248, 255); // Light blue background
+    doc.rect(margin, yPos - 6, textWidth, 12, 'F');
     
-    participants.forEach(participant => {
-      // Check if we need to move to the next row
-      if (count % 2 === 0 && count > 0) {
-        xPos = margin;
-        initialYPos = yPos + 20;
-      }
-      
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text("Nome", margin + 5, yPos);
+    doc.text("Participação", pageWidth - margin - 40, yPos);
+    yPos += 10;
+    
+    doc.setFont('helvetica', 'normal');
+    
+    participants.forEach((participant, index) => {
       // Check if we need a new page
-      if (initialYPos > 250) {
+      if (yPos > 250) {
         doc.addPage();
-        initialYPos = 20;
-        yPos = initialYPos;
-        xPos = margin;
+        yPos = 20;
       }
       
-      // Draw participant box
-      doc.setFillColor(255, 255, 255);
-      doc.roundedRect(xPos, initialYPos, participantWidth - 5, 15, 2, 2, 'F');
+      // Use slightly different background for alternating rows
+      const bgColor = index % 2 === 0 ? [245, 250, 255] : [250, 253, 255];
+      doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+      doc.rect(margin, yPos - 6, textWidth, 12, 'F');
       
-      // Add participant name
+      // Add participant name and participation percentage
       doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.text(participant.name, xPos + 5, initialYPos + 6);
+      doc.text(participant.name, margin + 5, yPos);
       
-      // Add participation percentage
-      doc.setFillColor(139, 92, 246); // Purple
-      doc.roundedRect(xPos + participantWidth - 40, initialYPos + 3, 30, 9, 3, 3, 'F');
+      // Add participation percentage with a visual bar
+      const barWidth = Math.max(5, (participant.participation / 100) * 50);
+      doc.setFillColor(65, 105, 225); // Royal Blue
+      doc.roundedRect(pageWidth - margin - 60, yPos - 4, barWidth, 8, 2, 2, 'F');
+      
+      // Add text showing percentage
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(8);
-      doc.text(`${participant.participation}%`, xPos + participantWidth - 25, initialYPos + 8, { align: 'center' });
+      if (barWidth > 15) {
+        // If bar is wide enough, put text inside
+        doc.text(`${participant.participation}%`, pageWidth - margin - 60 + barWidth / 2, yPos, { align: 'center' });
+      } else {
+        // Otherwise put text outside
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${participant.participation}%`, pageWidth - margin - 30, yPos, { align: 'right' });
+      }
       doc.setTextColor(0, 0, 0);
       
-      xPos += participantWidth;
-      count++;
-      if (count % 2 === 0) {
-        yPos = initialYPos;
-      }
+      yPos += 14;
     });
-    
-    yPos = initialYPos + 20;
   } else {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'italic');
@@ -186,12 +235,18 @@ export const generatePDF = async (data: ReportData) => {
     yPos += 10;
   }
   
-  // Add footer
-  yPos = doc.internal.pageSize.getHeight() - 20;
+  // Add decorative footer with gradient
+  const footerTop = doc.internal.pageSize.getHeight() - 25;
+  doc.setFillColor(220, 230, 250); // Light blue
+  doc.rect(0, footerTop, pageWidth, 25, 'F');
+  
+  // Add footer text
+  yPos = footerTop + 10;
   doc.setFontSize(8);
-  doc.setTextColor(107, 114, 128); // Gray
+  doc.setTextColor(51, 102, 204); // Dark blue
   doc.text('Relatório gerado automaticamente pelo Sistema de Gestão TLP', pageWidth / 2, yPos, { align: 'center' });
-  doc.text(`Data de geração: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, pageWidth / 2, yPos + 5, { align: 'center' });
+  yPos += 5;
+  doc.text(`Data de geração: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, pageWidth / 2, yPos, { align: 'center' });
   
   // Save the PDF
   const fileName = `relatorio-tlp-${groupData.groupNumber || 'grupo'}-${groupData.sprint || 'sprint'}.pdf`;
@@ -206,4 +261,3 @@ export const generatePDF = async (data: ReportData) => {
     participantes: participants.length
   });
 };
-
