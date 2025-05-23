@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 import { GroupData, Task, Participant } from '@/pages/Index';
 
@@ -11,11 +12,17 @@ interface ReportData {
 export const generatePDF = async (data: ReportData) => {
   const { groupData, completedTasks, plannedTasks, participants } = data;
   
-  // Create a new PDF document
-  const doc = new jsPDF();
+  // Create a new PDF document with UTF-8 support
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+    putOnlyUsedFonts: true,
+    compress: true
+  });
   
-  // Add a custom font
-  doc.setFont('helvetica', 'normal');
+  // Import fonts to support UTF-8 characters
+  doc.addFont("helvetica", "normal");
   
   // Set up document properties
   const pageWidth = doc.internal.pageSize.getWidth();
