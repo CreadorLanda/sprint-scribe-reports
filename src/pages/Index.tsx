@@ -16,6 +16,7 @@ export interface GroupData {
   projectName: string;
   sprint: string;
   date: string;
+  reportAuthor: string;  // New field for report author
 }
 
 export interface Task {
@@ -35,7 +36,8 @@ const Index = () => {
     groupNumber: '',
     projectName: 'Sistema de Gestão Escolar',
     sprint: '',
-    date: ''
+    date: '',
+    reportAuthor: ''  // Initialize the new field
   });
   
   const [completedTasks, setCompletedTasks] = useState<Task[]>([]);

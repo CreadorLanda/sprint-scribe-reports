@@ -1,7 +1,6 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, CheckCircle, Clock, Users } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Users, User } from 'lucide-react';
 import { GroupData, Task, Participant } from '@/pages/Index';
 
 interface ReportPreviewProps {
@@ -29,7 +28,7 @@ export const ReportPreview = ({
         <h2 className="text-2xl font-bold text-gray-900">
           Relatório TLP - {groupData.projectName}
         </h2>
-        <div className="flex justify-center gap-4 mt-2 text-sm text-gray-600">
+        <div className="flex flex-wrap justify-center gap-4 mt-2 text-sm text-gray-600">
           <span className="flex items-center gap-1">
             <Users className="w-4 h-4" />
             {groupData.groupNumber || 'Grupo não definido'}
@@ -38,6 +37,12 @@ export const ReportPreview = ({
             <Calendar className="w-4 h-4" />
             {formatDate(groupData.date)}
           </span>
+          {groupData.reportAuthor && (
+            <span className="flex items-center gap-1">
+              <User className="w-4 h-4" />
+              {groupData.reportAuthor}
+            </span>
+          )}
           {groupData.sprint && (
             <Badge variant="secondary">{groupData.sprint}</Badge>
           )}

@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import { GroupData, Task, Participant } from '@/pages/Index';
 
@@ -68,7 +67,7 @@ export const generatePDF = async (data: ReportData) => {
   // Add project info box with light blue background
   let yPos = 60;
   doc.setFillColor(240, 248, 255); // Alice Blue
-  doc.roundedRect(margin, yPos - 10, textWidth, 45, 3, 3, 'F');
+  doc.roundedRect(margin, yPos - 10, textWidth, 55, 3, 3, 'F');
   
   // Add project info text
   doc.setFontSize(11);
@@ -78,6 +77,8 @@ export const generatePDF = async (data: ReportData) => {
   doc.text(`Sprint/Fase: ${groupData.sprint || 'Não definida'}`, margin + 10, yPos);
   yPos += 10;
   doc.text(`Data: ${groupData.date ? new Date(groupData.date).toLocaleDateString('pt-BR') : 'Não definida'}`, margin + 10, yPos);
+  yPos += 10;
+  doc.text(`Autor: ${groupData.reportAuthor || 'Não definido'}`, margin + 10, yPos);
   yPos += 10;
   doc.text(`Equipe: ${participants.length} participante(s)`, margin + 10, yPos);
   yPos += 20;
@@ -254,6 +255,7 @@ export const generatePDF = async (data: ReportData) => {
   doc.text('Relatório gerado automaticamente pelo Sistema de Gestão TLP', pageWidth / 2, yPos, { align: 'center' });
   yPos += 5;
   doc.text(`Data de geração: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, pageWidth / 2, yPos, { align: 'center' });
+  doc.text(`Relatório criado por: ${groupData.reportAuthor || 'Não definido'}`, pageWidth / 2, yPos + 5, { align: 'center' });
   
   // Save the PDF
   const fileName = `relatorio-tlp-${groupData.groupNumber || 'grupo'}-${groupData.sprint || 'sprint'}.pdf`;
@@ -263,6 +265,7 @@ export const generatePDF = async (data: ReportData) => {
   console.log('Relatório gerado:', {
     grupo: groupData.groupNumber,
     sprint: groupData.sprint,
+    autor: groupData.reportAuthor,
     tarefasConcluidas: completedTasks.length,
     tarefasPlanejadas: plannedTasks.length,
     participantes: participants.length

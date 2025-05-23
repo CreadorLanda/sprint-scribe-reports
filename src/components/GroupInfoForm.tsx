@@ -50,6 +50,17 @@ export const GroupInfoForm = ({ groupData, onUpdate }: GroupInfoFormProps) => {
       </div>
       
       <div>
+        <Label htmlFor="reportAuthor">Autor do Relatório *</Label>
+        <Input
+          id="reportAuthor"
+          value={groupData.reportAuthor}
+          onChange={(e) => handleChange('reportAuthor', e.target.value)}
+          placeholder="Ex: João Silva"
+          className="mt-1"
+        />
+      </div>
+      
+      <div>
         <Label htmlFor="date">Data do Relatório</Label>
         <Input
           id="date"
